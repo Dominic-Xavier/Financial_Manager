@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="start_date" type="id"/>
+    <item name="end_date" type="id"/>
+    <item name="income_check_box" type="id"/>
+    <item name="expense_check_box" type="id"/>
+    <item name="Description" type="id"/>
+    <item name="Amount" type="id"/>
+</resources>

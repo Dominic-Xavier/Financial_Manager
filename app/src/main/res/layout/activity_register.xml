@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout3"
+    android:background="@color/signupColor"
+    tools:context=".Register"
+    tools:layout_editor_absoluteY="81dp"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buttonshapelogin"
+        android:text="Login"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/mob_num"
+        app:layout_constraintTop_toBottomOf="@+id/mob_num" />
+
+    <Button
+        android:id="@+id/create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buttonshapelogin"
+        android:text="Register"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/mob_num"
+        app:layout_constraintTop_toBottomOf="@+id/mob_num" />
+
+    <EditText
+        android:id="@+id/user"
+        android:layout_width="215dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="64dp"
+        android:background="@drawable/username"
+        android:drawableLeft="@drawable/ic_person_black_24dp"
+        android:ems="10"
+        android:hint="Username"
+        android:inputType="textPersonName"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView4"
+        app:layout_constraintStart_toStartOf="@+id/imageView4"
+        app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+
+    <EditText
+            android:id="@+id/pass"
+            android:layout_width="215dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/username"
+            android:drawableLeft="@drawable/ic_person_black_24dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/user"
+            app:layout_constraintStart_toStartOf="@+id/user"
+            app:layout_constraintTop_toBottomOf="@+id/user" />
+
+        <EditText
+            android:id="@+id/repass"
+            android:layout_width="215dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/username"
+            android:drawableLeft="@drawable/ic_person_black_24dp"
+            android:ems="10"
+            android:hint="Re enter your pass"
+            android:inputType="textPassword"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/pass"
+            app:layout_constraintStart_toStartOf="@+id/pass"
+            app:layout_constraintTop_toBottomOf="@+id/pass" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="101dp"
+            android:layout_height="102dp"
+            android:layout_marginTop="72dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@mipmap/loginlogo" />
+
+    <EditText
+        android:id="@+id/mob_num"
+        android:layout_width="215dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/username"
+        android:drawableLeft="@drawable/ic_person_black_24dp"
+        android:ems="10"
+        android:hint="Mobile No"
+        android:inputType="number"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/repass"
+        app:layout_constraintStart_toStartOf="@+id/repass"
+        app:layout_constraintTop_toBottomOf="@+id/repass" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
