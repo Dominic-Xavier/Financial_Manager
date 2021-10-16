@@ -65,8 +65,8 @@ public class sql extends SQLiteOpenHelper {
 
     public static String getData(String key,Context context){
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if(key.equals("User_name"))
-            return preferences.getString("User_name",null);
+        if(key.equals("Username"))
+            return preferences.getString("Username",null);
         else if(key.equals("u_id"))
             return preferences.getString("u_id",null);
         else if(key.equals("Profile_Pic"))
@@ -78,7 +78,7 @@ public class sql extends SQLiteOpenHelper {
     public static void delete_data(Context context){
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor edit = preferences.edit();
-        edit.remove("User_name");
+        edit.remove("Username");
         edit.remove("u_id");
         edit.commit();
     }

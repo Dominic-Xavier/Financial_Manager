@@ -108,7 +108,7 @@ public class Background extends AsyncTask <String, Void,String> {
         if(s.contains("u_id")) {
             String user = getUser_name();
             Intent intent_name = new Intent();
-            intent_name.setClass(context.getApplicationContext(),Database.class);
+            intent_name.setClass(context.getApplicationContext(), Database.class);
             sql.setData("u_id",s,context);
             sql.setData("User_name",user,context);
             context.startActivity(intent_name);

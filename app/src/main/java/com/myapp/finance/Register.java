@@ -5,6 +5,12 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.firebase.database.DatabaseReference;
+import com.myapp.finance.FireBase.DatabaseOperations;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 
@@ -13,10 +19,12 @@ public class Register extends AppCompatActivity {
     Button b1, b2;
     EditText t1, t2, t3,t4;
     String s1,s2,s3,s4;
+    Map<String, String> map = new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        DatabaseOperations operations = new DatabaseOperations(this);
 
 
         b1 =  findViewById(R.id.create);
@@ -40,8 +48,12 @@ public class Register extends AppCompatActivity {
                     t3.setText("");
                     t4.setText("");
                 } else {
-                    String url = sql.ip("register");;
-                    new Background(this).execute(s1,s2,url,s4);
+                    //String url = sql.ip("register");;
+                    //new Background(this).execute(s1,s2,url,s4);
+                    map.put("Username", s1);
+                    map.put("Password", s2);
+                    map.put("MobileNumber", s4);
+                    operations.register(map);
                 }
         });
 

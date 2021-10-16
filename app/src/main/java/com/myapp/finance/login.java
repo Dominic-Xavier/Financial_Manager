@@ -7,7 +7,11 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.myapp.finance.FireBase.DatabaseOperations;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,10 +20,12 @@ public class login extends AppCompatActivity {
     Button b1,b2,b3;
     TextView t1,t2;
     Boolean bool = false;
+    Map<String, String > map = new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        DatabaseOperations dos = new DatabaseOperations(this);
 
         b1 = findViewById(R.id.login);
         b2 = findViewById(R.id.can);
@@ -32,14 +38,18 @@ public class login extends AppCompatActivity {
         b1.setOnClickListener((v) -> {
             String user = t1.getText().toString();
             String pass = t2.getText().toString();
+
             if(user.equals("") || pass.equals("")) {
                 new sql(this).show("Error","Username or password is empty","Ok");
             }
             else {
-                Background bg = new Background(this);
+                /*Background bg = new Background(this);
                 String url = sql.ip("login");
                 bg.execute(user, pass, url);
-                bg.setUser_name(user);
+                bg.setUser_name(user);*/
+                map.put("Username", user);
+                map.put("Password", pass);
+                dos.login(map);
             }
         });
 

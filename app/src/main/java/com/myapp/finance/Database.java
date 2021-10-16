@@ -121,23 +121,17 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
         EditText str = s.startDate();
         EditText etr = s.endDate();
 
-        final String datas = sql.getData("User_name", this);
-        u_id = sql.getData("u_id", this);
-        name.setText("User:" + datas);
+        u_id = sql.getData("Username", this);
+        name.setText("User:" + u_id);
 
         //Used for redirecting user to login page
         Handler handler = new Handler();
-        handler.postAtFrontOfQueue(new Runnable() {
-            @Override
-            public void run() {
-                if (u_id == null || u_id == "") {
-                    startActivity(new Intent(Database.this, login.class));
-                    finish();
-                }
+        handler.postAtFrontOfQueue(() -> {
+            if (u_id == null || u_id == "") {
+                startActivity(new Intent(Database.this, login.class));
+                finish();
             }
         });
-
-
 
         String date = s.date();
         text.setText("Date:" + date);

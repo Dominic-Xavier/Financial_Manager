@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "276106843677",
+    "firebase_url": "https://financial-manager-7a019-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "financial-manager-7a019",
+    "storage_bucket": "financial-manager-7a019.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276106843677:android:f63cd79287d6a2ec3e98f4",
+        "android_client_info": {
+          "package_name": "com.myapp.finance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "276106843677-o60vjf9l6sg020s0uf94f1sprvq1mqkh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgbfUsJDbYWpxgsUv7dBsy8h1WfPY3W_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "276106843677-o60vjf9l6sg020s0uf94f1sprvq1mqkh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
