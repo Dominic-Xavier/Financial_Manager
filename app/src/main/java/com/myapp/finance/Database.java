@@ -1,17 +1,14 @@
 package com.myapp.finance;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
@@ -25,7 +22,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -33,28 +29,15 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.google.android.material.navigation.NavigationView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.myapp.finance.FireBase.DatabaseOperations;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -78,6 +61,7 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
     Toolbar mTool;
     String u_id,option_selected;
     TableRow row;
+    DatabaseOperations databaseOperations = new DatabaseOperations(this);
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("ResourceType")
@@ -143,17 +127,14 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
         insert.setOnClickListener((v) -> {
 
             try {
-                if(option_selected.equals("Select One")){
+                if(option_selected.equals("Select One"))
                     new sql(this).show("Error","Please select one option","ok");
-                }
                 else{
                     String keyword;
-                    if(option_selected.equals("Expense")){
+                    if(option_selected.equals("Expense"))
                         keyword = option_selected;
-                    }
-                    else {
+                    else
                         keyword = "Income";
-                    }
 
                     String des = "";
                     int amt = 0;
@@ -168,24 +149,34 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                         amts.add(amt);
                     }
 
-                    List json = new ArrayList();
+                    List<String> json = new ArrayList();
                     ListIterator l = desc.listIterator();
                     ListIterator l2 = amts.listIterator();
+                    Map<String, Object> map = new HashMap<>();
 
-                    while (l.hasNext() && l2.hasNext()) {
+                    if(isNetworkAvailable()){
+                        while (l.hasNext() && l2.hasNext()){
+                            map.put(String.valueOf(l.next()), (Integer)l2.next());
+                            databaseOperations.insertData(map, keyword);
+                        }
+                    }
+                    else
+                        new sql(Database.this).show("Network Error", "Check your Internet connection and try again", "Ok");
+                    /*while (l.hasNext() && l2.hasNext()) {
                         jobj = new JSONObject();
                         jobj.put("User_id", u_id);
                         jobj.put("option",keyword);
                         jobj.put("Des", l.next());
                         jobj.put("Amount", l2.next());
-                        json.add(jobj);
-                    }
+                        json.add((String) l.next());
+                        json1.add((Integer) l2.next());
+                    }*/
 
                     StringBuffer add = new StringBuffer();
                             add.append(json.toString());
                     System.out.println("Datas of json" + json);
 
-                    if (isNetworkAvailable()) {
+                    /*if (isNetworkAvailable()) {
                         Data d = new Data(this);
                         d.setAdd(add);
                         System.out.println("Add values:"+add.toString());
@@ -195,9 +186,8 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                         jobj.remove("Amount");
                         d.execute(keyword);
 
-                    } else {
-                        new sql(Database.this).show("Network Error", "Please connect to my network", "Ok");
-                    }
+                    } else
+                        new sql(Database.this).show("Network Error", "Check your Internet connection and try again", "Ok");*/
                 }
 
             } catch (Exception e) {
@@ -345,37 +335,18 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                     row.removeView(des());
                     row.removeView(amt());
                     t2.removeViewAt(t2.getChildCount()-1);
-                    list.removeAll(list);
-                    list1.removeAll(list1);
-                    desc.removeAll(desc);
-                    amts.removeAll(amts);
+                    list.clear();
+                    list1.clear();
+                    desc.clear();
+                    amts.clear();
                     if (jobj != null) {
                         jobj.remove("Des");
                         jobj.remove("Amount");
                     }
                 }
-
                 break;
             }
         }
-    }
-
-    private Response.Listener<JSONObject> createRequestSuccessListener() {
-        return new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                new sql(Database.this).show("Success", response.toString(), "Ok");
-            }
-        };
-    }
-
-    private Response.ErrorListener createRequestErrorListener() {
-        return new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                new sql(Database.this).show("Error", error.toString(), "ok");
-            }
-        };
     }
 
     public boolean isNetworkAvailable() {

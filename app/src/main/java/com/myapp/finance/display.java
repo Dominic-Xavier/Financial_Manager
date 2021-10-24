@@ -9,8 +9,6 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,25 +37,24 @@ public class display extends AppCompatActivity {
         t1.setColumnStretchable(2, true);
         Integer Amot = 0;
         TableLayout.LayoutParams Params = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
-        Params.setMargins(0,0,20,0);
+        Params.setMargins(0, 0, 20, 0);
         try {
             JSONArray getResponse = new JSONArray(data);
-            String date="",Des="",Keyword="No";
+            String date = "", Des = "", Keyword = "No";
             for (int k = 0; k < getResponse.length(); k++) {
                 TableRow row = new TableRow(display.this);
                 JSONObject jobj = getResponse.getJSONObject(k);
-                try{
+                try {
                     Keyword = jobj.getString("Inc_Des");
                     date = jobj.getString("Date");
                     Des = jobj.getString("Inc_Des");
                     Amot = jobj.getInt("Inc_Amt");
-                }
-                catch (Exception jerror){
+                } catch (Exception jerror) {
                     date = jobj.getString("Date");
                     Des = jobj.getString("Exp_Des");
                     Amot = jobj.getInt("Exp_Amt");
                 }
-                System.out.println("Json String value:"+Keyword);
+                System.out.println("Json String value:" + Keyword);
                 //Counting Total values
                 String col_name[] = {date, Des, Amot + ""};
                 for (String i : col_name) {
@@ -73,18 +70,16 @@ public class display extends AppCompatActivity {
                     row.addView(tv);
                 }
                 t1.addView(row);
-                total_values +=Amot;
+                total_values += Amot;
             }
-            total_amount.setText("Total:"+total_values);
+            total_amount.setText("Total:" + total_values);
             total_amount.setGravity(Gravity.RIGHT);
             total_amount.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             total_amount.setLayoutParams(Params);
             t1.addView(total_amount);
-        }
-        catch(JSONException e){
+        } catch (JSONException e) {
             new sql(this).show("Sorry", e.toString(), "OK");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             new sql(this).show("Error", e.toString(), "OK");
         }
 
@@ -162,7 +157,7 @@ public class display extends AppCompatActivity {
 
         close.setOnClickListener((v) -> {
             if (v.getId() == R.id.cl) {
-                startActivity(new Intent(display.this,Database.class));
+                startActivity(new Intent(display.this, Database.class));
                 finish();
             }
         });
@@ -171,50 +166,5 @@ public class display extends AppCompatActivity {
     public void onBackPressed() {
         startActivity(new Intent(this, Database.class));
         finish();
-    }
-
-    private Response.Listener<JSONArray> createRequestSuccessListener(){
-        return new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                TableLayout t1 = (TableLayout) findViewById(R.id.tbl);
-                Button close = (Button) findViewById(R.id.cl);
-                    try {
-                        for (int k = 0; k < response.length(); k++) {
-                            TableRow row = new TableRow(display.this);
-                            JSONObject jobj = response.getJSONObject(k);
-                            String date = jobj.getString("Date");
-                            String Des = jobj.getString("Description");
-                            Integer Amot = jobj.getInt("Amount");
-                            String col_name[] = {date, Des, Amot + ""};
-                            for (String i : col_name) {
-                                row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
-                                        TableLayout.LayoutParams.WRAP_CONTENT));
-                                TextView tv = new TextView(getApplicationContext());
-                                tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                                        TableRow.LayoutParams.WRAP_CONTENT));
-                                tv.setGravity(Gravity.CENTER);
-                                tv.setText(i);
-                                tv.setTextSize(15);
-                                tv.setPadding(5, 5, 5, 5);
-                                row.addView(tv);
-                            }
-                            t1.addView(row);
-                        }
-                    } catch (Exception e) {
-                        new sql(getApplicationContext()).show("Error", e.toString(), "OK");
-                    }
-
-            }
-        };
-    }
-
-    private Response.ErrorListener createRequestErrorListener(){
-        return new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                new sql(getApplicationContext()).show("Error",error.toString(),"ok");
-            }
-        };
     }
 }
