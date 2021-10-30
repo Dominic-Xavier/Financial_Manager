@@ -29,6 +29,7 @@ public class display extends AppCompatActivity {
 
         Intent in = getIntent();
         String data = in.getStringExtra("Jsondata");
+        System.out.println("Json Data is"+data);
 
         TableLayout t1 = findViewById(R.id.tbl);
         Button close = findViewById(R.id.cl);
@@ -45,14 +46,14 @@ public class display extends AppCompatActivity {
                 TableRow row = new TableRow(display.this);
                 JSONObject jobj = getResponse.getJSONObject(k);
                 try {
-                    Keyword = jobj.getString("Inc_Des");
+                    //Keyword = jobj.getString("Inc_Des");
                     date = jobj.getString("Date");
-                    Des = jobj.getString("Inc_Des");
-                    Amot = jobj.getInt("Inc_Amt");
+                    Des = jobj.getString("IncomeDes");
+                    Amot = jobj.getInt("IncomeAmt");
                 } catch (Exception jerror) {
                     date = jobj.getString("Date");
-                    Des = jobj.getString("Exp_Des");
-                    Amot = jobj.getInt("Exp_Amt");
+                    Des = jobj.getString("ExpenseDes");
+                    Amot = jobj.getInt("ExpenseAmt");
                 }
                 System.out.println("Json String value:" + Keyword);
                 //Counting Total values

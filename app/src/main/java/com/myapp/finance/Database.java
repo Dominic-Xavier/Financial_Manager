@@ -227,11 +227,13 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                                         str.setText("");
                                         etr.setText("");
                                     }
-                                    else if(Keyword[0].equals("Both")){
-                                        new Getjsonarray(Database.this).execute(Keyword[1], u_id, st_date, e_date);
-                                    }
-                                    else if(Keyword[0].equals("expense") || Keyword[0].equals("income"))
-                                        new Getjsonarray(Database.this).execute(Keyword[1],u_id,st_date, e_date,Keyword[0]);
+                                    else if(Keyword[0].equals("Both"))
+                                        databaseOperations
+                                        //new Getjsonarray(Database.this).execute(Keyword[1], u_id, st_date, e_date);
+
+                                    else if(Keyword[0].equals("Expense") || Keyword[0].equals("Income"))
+                                        databaseOperations.displayData(Keyword[0], st_date, e_date);
+                                        //new Getjsonarray(Database.this).execute(Keyword[1],u_id,st_date, e_date,Keyword[0]);
 
                                 } else {
                                     s.show("Error", "Invalid format", "Ok");

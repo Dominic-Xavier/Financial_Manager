@@ -12,11 +12,20 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.myapp.finance.Database;
+import com.myapp.finance.display;
 import com.myapp.finance.login;
 import com.myapp.finance.sql;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,12 +57,12 @@ public class DatabaseOperations {
                     if(snapshot.hasChild(user)){
                         String pass = snapshot.child(user).child("Password").getValue(String.class);
                         if(pass.equals(passWord)){
-                            displayData("Expense");
                             Toast.makeText(context, "Logged In...!", Toast.LENGTH_SHORT).show();
                             intent_name = new Intent();
                             intent_name.setClass(context.getApplicationContext(), Database.class);
                             context.startActivity(intent_name);
                             sql.setData("Username", user, context);
+                            displayData("Expense", "24-10-2021", "25-10-2021");
                             ((Activity)context).finish();
                         }
                         else
@@ -110,14 +119,13 @@ public class DatabaseOperations {
 
     public void insertData(Map<String, Object> map, String option){
         String username = sql.getData("Username", context);
-
         data.child(username).child(option).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if(!snapshot.hasChild(option)){
                     data.child(username).child(option).child(date).updateChildren(map, (DatabaseError error, DatabaseReference ref) -> {
                         if(ref.getKey().equals(date))
-                            Toast.makeText(context, "Inital method executed...!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Values inserted Successfully...!", Toast.LENGTH_SHORT).show();
                         else
                             Toast.makeText(context, "Error in inserting Values...!", Toast.LENGTH_SHORT).show();
                     });
@@ -131,15 +139,44 @@ public class DatabaseOperations {
         });
     }
 
-    public void displayData(String option) {
+    public void displayData(String option, String startDate, String endDate) {
         String username = sql.getData("Username", context);
-        data.child(username+"/"+option).addListenerForSingleValueEvent(new ValueEventListener() {
+        System.out.println("Username is:"+username);
+        JSONObject map = new JSONObject();
+        JSONArray jrr = new JSONArray();
+        data.child(username).child(option).orderByKey().startAt(startDate).endAt(endDate).addListenerForSingleValueEvent(new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot snapshots:snapshot.getChildren()) {
-                    Object val = snapshots.getValue();
-                    System.out.println("child nodes:-"+val);
+                for (DataSnapshot snapshots : snapshot.getChildren()) {
+                    String allDate = snapshots.getKey();
+                    Object value = snapshots.getValue();
+                    String con = String.valueOf(value);
+                    String replace = con.replaceAll("\\{"," ");
+                    String replacedString = replace.replaceAll("\\}"," ");
+                    String[] split = replacedString.split(",");
+                    System.out.println("All Dates "+allDate+" values "+split);
+                    for (String a: split) {
+                        String[] arr = a.split("=");
+                        JSONObject jobj = new JSONObject();
+                        System.out.println("Value is "+a);
+                        try {
+                            map.put(arr[0], arr[1]);
+                            jobj.put("Date",allDate);
+                            jobj.put(option+"Des",arr[0]);
+                            jobj.put(option+"Amt",arr[1]);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        jrr.put(jobj);
+                        System.out.println("Jobj is "+jobj);
+                    }
                 }
+                System.out.println("Jarr is "+jrr);
+                intent_name = new Intent();
+                intent_name.putExtra("Jsondata", String.valueOf(jrr));
+                intent_name.setClass(context.getApplicationContext(), display.class);
+                context.startActivity(intent_name);
             }
 
             @Override
@@ -147,5 +184,9 @@ public class DatabaseOperations {
                 s.show("Error", "Error is "+error,"Ok");
             }
         });
+    }
+
+    public void displayData(String startDate, String endDate){
+        
     }
 }

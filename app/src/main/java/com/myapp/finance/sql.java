@@ -194,15 +194,15 @@ public class sql extends SQLiteOpenHelper {
         }
 
         if(expense.isChecked()){
-            url="http://192.168.1.5/Display.php";
-            keyword = "expense";
+            //url="http://192.168.1.5/Display.php";
+            keyword = "Expense";
             Toast.makeText(context,"eXpense is selected",Toast.LENGTH_SHORT).show();
             return keyword+";;"+url;
         }
 
         if(income.isChecked()){
-            url="http://192.168.1.5/Display.php";
-            keyword = "income";
+            //url="http://192.168.1.5/Display.php";
+            keyword = "Income";
             Toast.makeText(context,"iNcome is selected",Toast.LENGTH_SHORT).show();
             return keyword+";;"+url;
         }
