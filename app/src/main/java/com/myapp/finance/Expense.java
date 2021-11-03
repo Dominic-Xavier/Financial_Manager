@@ -65,7 +65,7 @@ public class Expense extends Fragment {
                 TableRow row = new TableRow(context);
                 date = Date.get(k);
                 Des = Expense.get(k);
-                Amot = Integer.parseInt(Amount.get(k));
+                Amot = Integer.parseInt(Amount.get(k).trim());
                 if(!Des.equals("-")){
                     String col_name[] = {date, Des, Amot + ""};
                     for (String i : col_name) {

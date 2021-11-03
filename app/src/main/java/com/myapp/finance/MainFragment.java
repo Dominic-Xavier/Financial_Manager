@@ -51,22 +51,26 @@ public class MainFragment extends AppCompatActivity {
 
         try {
             JSONArray jrr = new JSONArray(Json_data);
-            JSONObject jobj = new JSONObject();
+
             for(int i=0;i<jrr.length();i++){
-                jobj = jrr.getJSONObject(i);
+                JSONObject jobj = jrr.getJSONObject(i);
                 date.add(jobj.getString("Date"));
-                Exp_Des.add(jobj.getString("Exp_Des"));
-                Exp_Amt.add(jobj.getString("Exp_Amt"));
-                Inc_Des.add(jobj.getString("Inc_Des"));
-                Inc_amt.add(jobj.getString("Inc_Amt"));
+                String expDes = jobj.getString("ExpenseDes");
+                if(expDes!=null && !expDes.isEmpty()){
+                    Exp_Des.add(expDes);
+                    Exp_Amt.add(jobj.getString("ExpenseAmt"));
+                }
+                String incDes = jobj.getString("IncomeDes");
+                if(incDes!=null && !incDes.isEmpty())  {
+                    Inc_Des.add(incDes);
+                    Inc_amt.add(jobj.getString("IncomeAmt"));
+                }
                 System.out.println("All Data:"+date+":"+Exp_Des+":"+Exp_Amt+":"+Inc_Des+":"+Inc_amt);
             }
 
-        } catch (JSONException e) {
-            new sql(this).show("Json Error",e.toString(),"Ok");
         }
         catch (Exception el){
-            new sql(this).show("Main Error",el.toString(),"Ok");
+            new sql(this).show("Json Error",el.toString(),"Ok");
         }
 
         close.setOnClickListener((v)-> {

@@ -228,7 +228,7 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                                         etr.setText("");
                                     }
                                     else if(Keyword[0].equals("Both"))
-                                        databaseOperations
+                                        databaseOperations.displayData(st_date, e_date);
                                         //new Getjsonarray(Database.this).execute(Keyword[1], u_id, st_date, e_date);
 
                                     else if(Keyword[0].equals("Expense") || Keyword[0].equals("Income"))
@@ -372,9 +372,8 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                 return false; // Not connected to an access point
             }
             return true; // Connected to an access point
-        } else {
+        } else
             return false; // Wi-Fi adapter is OFF
-        }
     }
 
     @Override
