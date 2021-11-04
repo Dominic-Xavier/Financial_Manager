@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -43,16 +44,10 @@ public class DatabaseOperations {
     sql s = new sql(context);
     Intent intent_name;
     List<Date> col = new ArrayList<>();
+    DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    int count = 0;
 
     JSONArray jrr = new JSONArray();
-
-    public JSONArray getJrr() {
-        return jrr;
-    }
-
-    public void setJrr(JSONArray jrr) {
-        this.jrr = jrr;
-    }
 
     private FirebaseDatabase database = FirebaseDatabase.getInstance("https://financial-manager-7a019-default-rtdb.asia-southeast1.firebasedatabase.app/");
     private DatabaseReference data = database.getReference();
@@ -145,9 +140,9 @@ public class DatabaseOperations {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     public void displayData(String option, String startDate, String endDate) {
-        DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
         String username = sql.getData("Username", context);
         System.out.println("Username is:"+username);
 
@@ -155,11 +150,15 @@ public class DatabaseOperations {
         data.child(username).child(option).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+
                 for (DataSnapshot snapshots : snapshot.getChildren()) {
                     String allDate = snapshots.getKey();
                     try {
-                        //Strorig all the dates in an arraylist
-                        col.add(sdf.parse(allDate));
+                        Date date = StringToDateConverter(allDate);
+                        if(date.after(sdf.parse(startDate)) && date.before(sdf.parse(endDate)))
+                            //Storing all the dates which matches the criteria in a list
+                            col.add(sdf.parse(allDate));
+                        Log.i("Size of list", String.valueOf(col.size()));
                     } catch (ParseException e) {
                         s.show("Parsing error", e.getMessage(), "ok");
                     }
@@ -171,51 +170,48 @@ public class DatabaseOperations {
                     i++;
                     try {
                         System.out.println("Date is "+date+" My Date is "+sdf.parse(startDate));
-                        if(date.after(sdf.parse(startDate)) && date.before(sdf.parse(endDate))){
-                            System.out.println("Dates are "+date+" My Date is "+sdf.parse(startDate));
-                            String newdate = dateConverter(date);
-                            System.out.println("New Date Format is "+newdate);
-                            int finalI = i;
-                            data.child(username).child(option).child(newdate).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    String allDate = snapshot.getKey();
-                                    System.out.println("DAtes "+allDate);
-                                    Object value = snapshot.getValue();
-                                    String con = String.valueOf(value);
-                                    String replace = con.replaceAll("\\{"," ");
-                                    String replacedString = replace.replaceAll("\\}"," ");
-                                    String[] split = replacedString.split(",");
-                                    System.out.println("All Dates "+allDate+" values "+split);
-                                    for (String a: split) {
-                                        String[] arr = a.split("=");
-                                        JSONObject jobj = new JSONObject();
-                                        System.out.println("Value is "+a);
-                                        try {
-                                            jobj.put("Date",allDate);
-                                            jobj.put(option+"Des", arr[0].trim());
-                                            jobj.put(option+"Amt", arr[1].trim());
-                                        } catch (JSONException e) {
-                                            s.show("Json Error", e.getMessage(), "Ok");
-                                        }
-                                        jrr.put(jobj);
-                                        if(finalI >= col.size()){
-                                            intent_name = new Intent();
-                                            intent_name.putExtra("Jsondata", String.valueOf(jrr));
-                                            System.out.println("Jarr is "+getJrr());
-                                            intent_name.setClass(context.getApplicationContext(), display.class);
-                                            context.startActivity(intent_name);
-                                            ((Activity)context).finish();
-                                        }
+                        System.out.println("Dates are "+date+" My Date is "+sdf.parse(startDate));
+                        String newdate = dateConverter(date);
+                        System.out.println("New Date Format is "+newdate);
+                        int finalI = i;
+                        data.child(username).child(option).child(newdate).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                String allDate = snapshot.getKey();
+                                Object value = snapshot.getValue();
+                                String con = String.valueOf(value);
+                                String replace = con.replaceAll("\\{"," ");
+                                String replacedString = replace.replaceAll("\\}"," ");
+                                String[] split = replacedString.split(",");
+                                System.out.println("All Dates "+allDate+" values "+split);
+                                for (String a: split) {
+                                    String[] arr = a.split("=");
+                                    JSONObject jobj = new JSONObject();
+                                    System.out.println("Value is "+a);
+                                    try {
+                                        jobj.put("Date",allDate);
+                                        jobj.put(option+"Des", arr[0].trim());
+                                        jobj.put(option+"Amt", arr[1].trim());
+                                    } catch (JSONException e) {
+                                        s.show("Json Error", e.getMessage(), "Ok");
+                                    }
+                                    jrr.put(jobj);
+                                    if(finalI == col.size()){
+                                        System.out.println("Jrr Arr "+jrr);
+                                        intent_name = new Intent();
+                                        intent_name.putExtra("Jsondata", String.valueOf(jrr));
+                                        intent_name.setClass(context.getApplicationContext(), display.class);
+                                        context.startActivity(intent_name);
+                                        ((Activity)context).finish();
                                     }
                                 }
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-                                    s.show("Error", error.getMessage(), "Ok");
-                                }
-                            });
-                        }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                s.show("Error", error.getMessage(), "Ok");
+                            }
+                        });
 
                     } catch (ParseException e) {
                         s.show("Parsing Error", e.getMessage(), "Ok");
@@ -237,37 +233,61 @@ public class DatabaseOperations {
         String username = sql.getData("Username", context);
         String Keyword;
         JSONArray jrr = new JSONArray();
+
         for (int i=0;i<2;i++){
             if(i==0)
                 Keyword = "Expense";
             else
                 Keyword = "Income";
+            String finalKeyword = Keyword;
             data.child(username).child(Keyword).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot snapshots : snapshot.getChildren()) {
-                        String keyword = snapshots.getKey();
-                            String allDate = snapshots.getKey();
-                            Object value = snapshots.getValue();
-                            String con = String.valueOf(value);
-                            String replace = con.replaceAll("\\{"," ");
-                            String replacedString = replace.replaceAll("\\}"," ");
-                            String[] split = replacedString.split(",");
-                            System.out.println("All Dates "+allDate+" values "+split);
-                            JSONObject jobj = new JSONObject();
-                            for (String a: split) {
-                                String[] arr = a.split("=");
-                                System.out.println("Value is "+a);
-                                try {
-                                    jobj.put("Date",allDate);
-                                    jobj.put(keyword+"Des",arr[0].trim());
-                                    jobj.put(keyword+"Amt",arr[1].trim());
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                jrr.put(jobj);
+                        String allDate = snapshots.getKey();
+                        try {
+                            Date date = StringToDateConverter(allDate);
+                            if(date.after(sdf.parse(startDate)) && date.before(sdf.parse(endDate))){
+                                data.child(username).child(finalKeyword).child(allDate).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        try {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                String des = dataSnapshot.getKey();
+                                                Object value = dataSnapshot.getValue();
+
+                                                JSONObject jobj = new JSONObject();
+                                                jobj.put("Date",allDate);
+                                                jobj.put(finalKeyword+"Des", des);
+                                                jobj.put(finalKeyword+"Amt", value);
+                                                jrr.put(jobj);
+                                                count++;
+                                            }
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        System.out.println("JSON Arrays "+jrr);
+                                        if(finalKeyword.equals("Income")){
+                                            System.out.println("Jrrr Array "+jrr);
+                                            intent_name = new Intent();
+                                            intent_name.putExtra("Jsondata", String.valueOf(jrr));
+                                            intent_name.setClass(context.getApplicationContext(), MainFragment.class);
+                                            context.startActivity(intent_name);
+                                            ((Activity)context).finish();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        s.show("Database Error", error.getMessage(), "Ok");
+                                    }
+                                });
                             }
-                            System.out.println("Jrr is "+jrr);
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -277,108 +297,7 @@ public class DatabaseOperations {
                 }
 
             });
-            if(jrr.equals(null) || jrr==null || jrr.length()==0){
-                s.show("Sorry", "Jsonarray is empty", "Done");
-                break;
-            }
-            intent_name = new Intent();
-            intent_name.putExtra("Jsondata", String.valueOf(jrr));
-            intent_name.setClass(context.getApplicationContext(), MainFragment.class);
-            context.startActivity(intent_name);
         }
-    }
-
-    public void displayData(){
-        String username = sql.getData("Username", context);
-        JSONArray jrr = new JSONArray();
-        data.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot snapshots : snapshot.getChildren()) {
-                    String keyword = snapshots.getKey();
-                    if(keyword.equals("Income")){
-                        data.child(username).child(keyword).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                for (DataSnapshot snapshots : snapshot.getChildren()) {
-                                    String allDate = snapshots.getKey();
-                                    Object value = snapshots.getValue();
-                                    String con = String.valueOf(value);
-                                    String replace = con.replaceAll("\\{"," ");
-                                    String replacedString = replace.replaceAll("\\}"," ");
-                                    String[] split = replacedString.split(",");
-                                    System.out.println("All Dates "+allDate+" values "+split);
-                                    JSONObject jobj = new JSONObject();
-                                    for (String a: split) {
-                                        String[] arr = a.split("=");
-                                        System.out.println("Value is "+a);
-                                        try {
-                                            jobj.put("Date",allDate);
-                                            jobj.put(keyword+"Des",arr[0]);
-                                            jobj.put(keyword+"Amt",arr[1]);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                        jrr.put(jobj);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                s.show("Error", error.getMessage(),"Ok");
-                            }
-                        });
-                    }
-
-                    if(keyword.equals("Expense")){
-                        data.child(username).child(keyword).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                for (DataSnapshot snapshots : snapshot.getChildren()) {
-                                    String allDate = snapshots.getKey();
-                                    Object value = snapshots.getValue();
-                                    String con = String.valueOf(value);
-                                    String replace = con.replaceAll("\\{"," ");
-                                    String replacedString = replace.replaceAll("\\}"," ");
-                                    String[] split = replacedString.split(",");
-                                    System.out.println("All Dates "+allDate+" values "+split);
-                                    JSONObject jobj = new JSONObject();
-                                    for (String a: split) {
-                                        String[] arr = a.split("=");
-                                        System.out.println("Value is "+a);
-                                        try {
-                                            jobj.put("Date",allDate);
-                                            jobj.put(keyword+"Des",arr[0]);
-                                            jobj.put(keyword+"Amt",arr[1]);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                        jrr.put(jobj);
-                                        System.out.println("Jobj is "+jrr);
-                                    }
-                                }
-                                intent_name = new Intent();
-                                intent_name.putExtra("Jsondata", String.valueOf(jrr));
-                                intent_name.setClass(context.getApplicationContext(), MainFragment.class);
-                                context.startActivity(intent_name);
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                s.show("Error", error.getMessage(),"Ok");
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                s.show("Error", "Error is "+error,"Ok");
-            }
-        });
     }
 
     public String dateConverter(Date dates) {
@@ -386,5 +305,10 @@ public class DatabaseOperations {
         String format = formatter.format(dates);
         System.out.println(format);
         return format;
+    }
+
+    public Date StringToDateConverter(String date) throws ParseException {
+        Date date1=new SimpleDateFormat("dd-MM-yyyy").parse(date);
+        return date1;
     }
 }

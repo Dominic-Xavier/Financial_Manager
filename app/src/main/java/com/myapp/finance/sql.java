@@ -146,14 +146,14 @@ public class sql extends SQLiteOpenHelper {
 
     public TextView S_date(){
         TextView t = new TextView(context);
-        t.setText("Start Date");
+        t.setText("Start After");
         t.setTextSize(20);
         t.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
         return t;
     }
     public TextView E_date(){
         TextView t = new TextView(context);
-        t.setText("End Date");
+        t.setText("End Before");
         t.setTextSize(20);
         t.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
         return t;

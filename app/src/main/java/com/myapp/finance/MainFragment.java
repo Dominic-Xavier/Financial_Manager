@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TableLayout;
+import android.widget.Toast;
 
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
@@ -47,27 +48,28 @@ public class MainFragment extends AppCompatActivity {
 
         String Json_data = json.getStringExtra("Jsondata");
 
-        System.out.println("Json Datas of main fragment:"+Json_data);
+        System.out.println("Json Data of main fragment:"+Json_data);
 
         try {
             JSONArray jrr = new JSONArray(Json_data);
-
             for(int i=0;i<jrr.length();i++){
                 JSONObject jobj = jrr.getJSONObject(i);
-                date.add(jobj.getString("Date"));
-                String expDes = jobj.getString("ExpenseDes");
-                if(expDes!=null && !expDes.isEmpty()){
-                    Exp_Des.add(expDes);
+                try {
+                    date.add(jobj.getString("Date"));
+                    Exp_Des.add(jobj.getString("ExpenseDes"));
                     Exp_Amt.add(jobj.getString("ExpenseAmt"));
                 }
-                String incDes = jobj.getString("IncomeDes");
-                if(incDes!=null && !incDes.isEmpty())  {
-                    Inc_Des.add(incDes);
-                    Inc_amt.add(jobj.getString("IncomeAmt"));
+                catch (Exception e){
+                    try {
+                        Inc_Des.add(jobj.getString("IncomeDes"));
+                        Inc_amt.add(jobj.getString("IncomeAmt"));
+                    }
+                    catch (Exception el){
+                        Toast.makeText(this,"No Value for Income",Toast.LENGTH_SHORT).show();
+                    }
                 }
-                System.out.println("All Data:"+date+":"+Exp_Des+":"+Exp_Amt+":"+Inc_Des+":"+Inc_amt);
             }
-
+            System.out.println("All Data:"+date+":"+Exp_Des+":"+Exp_Amt+":"+Inc_Des+":"+Inc_amt);
         }
         catch (Exception el){
             new sql(this).show("Json Error",el.toString(),"Ok");
