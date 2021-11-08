@@ -157,20 +157,11 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                     if(isNetworkAvailable()){
                         while (l.hasNext() && l2.hasNext()){
                             map.put(String.valueOf(l.next()), (Integer)l2.next());
-                            databaseOperations.insertData(map, keyword);
                         }
+                        databaseOperations.insertData(map, keyword);
                     }
                     else
                         new sql(Database.this).show("Network Error", "Check your Internet connection and try again", "Ok");
-                    /*while (l.hasNext() && l2.hasNext()) {
-                        jobj = new JSONObject();
-                        jobj.put("User_id", u_id);
-                        jobj.put("option",keyword);
-                        jobj.put("Des", l.next());
-                        jobj.put("Amount", l2.next());
-                        json.add((String) l.next());
-                        json1.add((Integer) l2.next());
-                    }*/
 
                     StringBuffer add = new StringBuffer();
                             add.append(json.toString());
@@ -219,6 +210,13 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                                 String st_date = str.getText().toString();
                                 String e_date = etr.getText().toString();
                                 if (s.validformat(st_date) && s.validformat(e_date)) {
+                                    if(st_date.compareTo(e_date)>0){
+                                        s.show("Date Error","Start Date cannot be greater than End Date", "Ok");
+                                        str.setText("");
+                                        etr.setText("");
+                                        layout.removeAllViews();
+                                        return;
+                                    }
                                     String value = s.onCheckboxClicked(expense,income),url = "";
                                     String Keyword[] = value.split(";;");
                                     //Keyword[0] denotes keyword and Keyword[1] denotes URL
@@ -389,8 +387,9 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                 break;
             }
             case R.id.expense:{
-                final String ip = "http://192.168.1.5/Total_exp_inc.php";
-                new Getjsonarray(this).execute(ip,u_id);
+                /*final String ip = "http://192.168.1.5/Total_exp_inc.php";
+                new Getjsonarray(this).execute(ip,u_id);*/
+                databaseOperations.displayData();
                 break;
             }
         }
