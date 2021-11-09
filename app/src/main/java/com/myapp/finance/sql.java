@@ -71,6 +71,8 @@ public class sql extends SQLiteOpenHelper {
             return preferences.getString("u_id",null);
         else if(key.equals("Profile_Pic"))
             return preferences.getString("Profile_Pic",null);
+        else if(key.equals("ImageName"))
+            return preferences.getString("ImageName",null);
         else
             return null;
     }

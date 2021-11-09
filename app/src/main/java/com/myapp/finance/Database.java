@@ -382,8 +382,10 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                 logout();
                 break;
             case R.id.my_account: {
-                String url = "http://192.168.1.5/User_details.php";
-                new Getjsonarray(this).execute(url,u_id);
+                /*String url = "http://192.168.1.5/User_details.php";
+                new Getjsonarray(this).execute(url,u_id);*/
+                startActivity(new Intent(this, Account_Details.class));
+                finish();
                 break;
             }
             case R.id.expense:{

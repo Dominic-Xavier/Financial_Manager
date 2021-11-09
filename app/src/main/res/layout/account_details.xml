@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/consLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Account_Details">
@@ -14,31 +15,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_pic"
         android:layout_width="match_parent"
-        android:layout_height="192dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/tableLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include3">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/profile_pic"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            app:srcCompat="@mipmap/baseline_photo_size_select_actual_black_48dp" />
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/include3" />
 
     <TableLayout
         android:id="@+id/tableLayout2"
+        android:layout_marginTop="60dp"
         android:layout_width="match_parent"
-        android:layout_height="167dp"
+        android:layout_height="0dp"
         android:stretchColumns="*"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/quit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+        app:layout_constraintTop_toBottomOf="@+id/profile_pic">
 
         <TableRow
             android:layout_width="match_parent"
@@ -106,10 +104,9 @@
                 android:layout_gravity="center"
                 android:text="Number"
                 android:textSize="20dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </TableRow>
     </TableLayout>
-
 
 
     <androidx.appcompat.widget.AppCompatImageButton
@@ -117,26 +114,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@mipmap/baseline_add_a_photo_black_48dp"
-        app:layout_constraintBottom_toTopOf="@+id/tableLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.736"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_pic" />
 
     <Button
         android:id="@+id/quit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Close"
-        android:textStyle="bold"
-        android:textSize="20dp"
-        android:textColor="@color/white"
         android:background="@color/colorAccent"
+        android:text="Close"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

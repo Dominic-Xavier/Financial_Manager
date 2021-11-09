@@ -38,6 +38,7 @@
             android:parentActivityName=".Database"/>
         <activity android:name=".MainFragment"
             android:parentActivityName=".Database"/>
+        <activity android:name=".DisplayImage"/>
     </application>
 
 </manifest>

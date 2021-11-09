@@ -1,36 +1,43 @@
 package com.myapp.finance;
 
-import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+
+import static java.lang.System.currentTimeMillis;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class Account_Details extends AppCompatActivity {
@@ -41,17 +48,30 @@ public class Account_Details extends AppCompatActivity {
     ImageView profile_pic;
     final int IMAGE_CODE = 1;
     Uri image;
+    Bitmap bitmaps;
+
+    StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+
+    Handler handler = new Handler();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_details);
+
         String u_id="",Name="",mob_num="";
 
         Intent in = getIntent();
         String data = in.getStringExtra("Jsondata");
 
         System.out.println("Account Details:"+data);
+
+        handler.postAtFrontOfQueue(() -> {
+            String imageName = sql.getData("ImageName", this);
+            if(imageName!=null && !imageName.equals("") && !imageName.isEmpty()){
+                downloadImage();
+            }
+        });
 
         name = findViewById(R.id.Name);
         id = findViewById(R.id.U_id);
@@ -60,11 +80,21 @@ public class Account_Details extends AppCompatActivity {
         profile_pic = findViewById(R.id.profile_pic);
         profile_button = findViewById(R.id.profile_pic_button);
 
+        profile_pic.setOnClickListener((View view) -> {
+            Intent intent = new Intent(Account_Details.this, DisplayImage.class);
+            System.out.println("BitMap is "+bitmaps);
+            intent.putExtra("Uri", image);
+            intent.putExtra("bitMapImage", bitmaps);
+            startActivity(intent);
+            finish();
+        });
+
         profile_button.setOnClickListener((v)-> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
             intent.setType("image/*");
             if (Build.VERSION.SDK_INT >= 23) {
-                if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                startActivityForResult(intent,IMAGE_CODE);
+                /*if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED ) {
                     startActivityForResult(intent,IMAGE_CODE);
                 }
@@ -72,15 +102,15 @@ public class Account_Details extends AppCompatActivity {
                         == PackageManager.PERMISSION_DENIED) {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                     new sql(this).show("Permission Denied","You need to grant permission to set profile pic. To grant permission Go to Settings-> App Manager -> Financial Manager and give permission","Ok");
-                }
-                
+                }*/
+
             } else {
                 startActivityForResult(intent,IMAGE_CODE);
             }
 
         });
 
-        try {
+        /*try {
             JSONArray jrr = new JSONArray(data);
             for(int i=0;i<jrr.length();i++){
                 JSONObject arr = jrr.getJSONObject(i);
@@ -93,7 +123,7 @@ public class Account_Details extends AppCompatActivity {
             }
         } catch (JSONException e) {
             new sql(this).show("Error",e.toString(),"Ok");
-        }
+        }*/
 
         quit.setOnClickListener((v)->{
             startActivity(new Intent(Account_Details.this,Database.class));
@@ -102,6 +132,7 @@ public class Account_Details extends AppCompatActivity {
     }
 
     public void onBackPressed(){
+        super.onBackPressed();
         startActivity(new Intent(Account_Details.this,Database.class));
         finish();
     }
@@ -112,6 +143,11 @@ public class Account_Details extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==IMAGE_CODE && resultCode==RESULT_OK && null!=data){ //null!=data Can we give condition like this?
             try {
+                image = data.getData();
+                uploadImage();
+            }
+            catch (Exception e){}
+            /*try {
                 image = data.getData();
                 ImageDecoder.Source profile_picture = ImageDecoder.createSource(this.getContentResolver(), image);
                 Bitmap bitmap = ImageDecoder.decodeBitmap(profile_picture);
@@ -137,7 +173,7 @@ public class Account_Details extends AppCompatActivity {
             }
             catch (Exception ex){
                 new sql(this).show("Failed",ex.toString(),"Ok");
-            }
+            }*/
         }
     }
 
@@ -161,5 +197,51 @@ public class Account_Details extends AppCompatActivity {
                 boolean b = mFolder.mkdirs();
             }
         }
+    }
+
+    private String getFileExtension(Uri image) {
+        ContentResolver contentResolver = getContentResolver();
+
+        MimeTypeMap typeMap = MimeTypeMap.getSingleton();
+
+        return typeMap.getExtensionFromMimeType(contentResolver.getType(image));
+    }
+
+    private void uploadImage(){
+        if(image!=null){
+            long milliSec =  System.currentTimeMillis();
+            String imageName = milliSec+"."+getFileExtension(image);
+            sql.setData("ImageName", imageName, this);
+            StorageReference ref = storageReference.child("Profile Pics").child(imageName);
+            ref.putFile(image).addOnCompleteListener((@NonNull Task<UploadTask.TaskSnapshot> task) -> {
+                ref.getDownloadUrl().addOnSuccessListener((Uri uri) -> {
+                    displayImage(image);
+                    Toast.makeText(Account_Details.this, "Image is uploaded Successfully...!", Toast.LENGTH_SHORT).show();
+                });
+            });
+        }
+    }
+
+    private void displayImage(Uri uri){
+        profile_pic.setImageURI(uri);
+    }
+
+    private void downloadImage(){
+        String name = sql.getData("ImageName", this);
+        StorageReference ref = storageReference.child("Profile Pics").child(name);
+        ref.getBytes(1024*1024).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                bitmaps = bitmap;
+                profile_pic.setImageBitmap(bitmap);
+                Toast.makeText(Account_Details.this, "Image Downloaded Susccessfully...!", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                new sql(Account_Details.this).show("Firebase Error", e.getMessage(), "Ok");
+            }
+        });
     }
 }
