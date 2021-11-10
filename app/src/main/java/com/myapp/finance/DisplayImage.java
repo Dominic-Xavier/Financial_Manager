@@ -7,13 +7,10 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import de.hdodenhof.circleimageview.CircleImageView;
 
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
 public class DisplayImage extends AppCompatActivity {
@@ -21,6 +18,7 @@ public class DisplayImage extends AppCompatActivity {
     ScaleGestureDetector scaleGestureDetector;
     private Float FACTOR = 1.0f;
     ImageView imageView;
+    CircleImageView c;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

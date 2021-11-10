@@ -81,7 +81,8 @@ public class sql extends SQLiteOpenHelper {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor edit = preferences.edit();
         edit.remove("Username");
-        edit.remove("u_id");
+        edit.remove("ImageName");
+
         edit.commit();
     }
 

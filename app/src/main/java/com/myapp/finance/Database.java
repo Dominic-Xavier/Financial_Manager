@@ -61,6 +61,7 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
     Toolbar mTool;
     String u_id,option_selected;
     TableRow row;
+    TextView loadingImage;
     DatabaseOperations databaseOperations = new DatabaseOperations(this);
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -80,6 +81,7 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
         action.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
 
         NavigationView mNavigationView = findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
