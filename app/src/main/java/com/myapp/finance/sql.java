@@ -1,59 +1,71 @@
 package com.myapp.finance;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.ImageDecoder;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 public class sql extends SQLiteOpenHelper {
-    static Context context;
+    Context context;
     static SharedPreferences preferences;
     AlertDialog dialog;
-    Uri image;
-
+    SQLiteDatabase db;
+    ContentValues cv;
+    private final static String TABLE_NAME = "financialdata";
+    List<String> dates = new ArrayList<>();
+    List<String> totAlExp = new ArrayList<>();
+    List<String> totAlInc = new ArrayList<>();
+    Map<String, List<String>> map = new HashMap<>();
 
     public sql(Context context) {
-        super(context, "database.db", null, 1);
+        super(context, "Finance.db", null, 1);
         this.context = context;
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        this.db = sqLiteDatabase;
+        sqLiteDatabase.execSQL("create table "+TABLE_NAME+"(Dates text NOT NULL, ExpenseAmount int, IncomeAmount int)");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop table if exists "+TABLE_NAME);
+        onCreate(db);
     }
 
     public static void setData(String Key,String value,Context context){
@@ -82,18 +94,56 @@ public class sql extends SQLiteOpenHelper {
         SharedPreferences.Editor edit = preferences.edit();
         edit.remove("Username");
         edit.remove("ImageName");
-
         edit.commit();
     }
 
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table data (directory_name text NOT NULL,file_name text NOT NULL,Path text NOT NULL)");
+    public void insertData(String date, String expenseAmount, String incomeAmount){
+        try {
+            if(expenseAmount==null)
+                expenseAmount = String.valueOf(0);
+            if(incomeAmount==null)
+                incomeAmount = String.valueOf(0);
+            db = this.getWritableDatabase();
+            cv = new ContentValues();
+            cv.put("Dates", date);
+            cv.put("ExpenseAmount", expenseAmount);
+            cv.put("IncomeAmount", incomeAmount);
+            long insert = db.insert(TABLE_NAME, null, cv);
+            if(insert==-1)
+                Toast.makeText(context, "Error in inserting values...!", Toast.LENGTH_SHORT).show();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("drop table if exists data");
-        onCreate(db);
+    public Map<String, List<String>> getDatas(){
+        db = this.getReadableDatabase();
+        String Query1 = "SELECT sum(ExpenseAmount) AS ExpenseTotal, sum(IncomeAmount) AS IncomeTotal, substr(Dates,4) AS Month_and_Year" +
+                "    FROM "+TABLE_NAME+
+                "  GROUP BY substr(Dates,4)" +
+                "    ORDER BY substr(Dates,7,2)||substr(Dates,4,2)";
+        String qery = "select year (Dates) as year, month (Dates) as month,  sum(IncomeAmount) as Total_income, sum(ExpenseAmount) as Total_Expense FROM "+TABLE_NAME+" group by year(Dates), month(Dates)";
+        String query = "SELECT sum(IncomeAmount) AS Total_income, sum(ExpenseAmount) AS Total_Expense, substr(Dates,4) AS Month_and_Year FROM "+TABLE_NAME;
+        Cursor cursor = db.rawQuery(Query1,null);
+        while (cursor.moveToNext()){
+            String totalEXP =  cursor.getString(0);
+            String totalINC =  cursor.getString(1);
+            String monthWiseDate =  cursor.getString(2);
+            dates.add(monthWiseDate);
+            totAlExp.add(totalEXP);
+            totAlInc.add(totalINC);
+            System.out.println("All Datas are "+totalEXP+" "+totalINC+" "+monthWiseDate);
+        }
+        map.put("allDates", dates);
+        map.put("allExpenses", totAlExp);
+        map.put("allIncomes", totAlInc);
+        return map;
+    }
+
+    public void deleteAllDataInTable(){
+        db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
     }
 
     public Boolean image_Details(String directory_Name,String file_Name,String path) {
@@ -255,7 +305,7 @@ public class sql extends SQLiteOpenHelper {
         return ip;
     }
 
-    public static String ip(String KEY){
+    public String ip(String KEY){
         String ip="";
         switch (KEY){
             case "login":

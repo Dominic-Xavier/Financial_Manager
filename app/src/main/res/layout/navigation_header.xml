@@ -4,13 +4,4 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/background">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/DP"
-            android:layout_marginTop="200dp"
-            android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@mipmap/baseline_photo_size_select_actual_black_48dp"/>
-
 </LinearLayout>

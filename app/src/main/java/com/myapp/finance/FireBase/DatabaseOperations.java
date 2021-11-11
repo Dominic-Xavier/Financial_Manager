@@ -179,6 +179,14 @@ public class DatabaseOperations {
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 String allDate = snapshot.getKey();
                                 Object value = snapshot.getValue();
+                                if(value==null){
+                                    intent_name = new Intent();
+                                    intent_name.putExtra("Jsondata", String.valueOf(jrr));
+                                    intent_name.setClass(context.getApplicationContext(), display.class);
+                                    context.startActivity(intent_name);
+                                    ((Activity)context).finish();
+                                    return;
+                                }
                                 String con = String.valueOf(value);
                                 String replace = con.replaceAll("\\{"," ");
                                 String replacedString = replace.replaceAll("\\}"," ");
@@ -299,6 +307,7 @@ public class DatabaseOperations {
                 }
             });
         }
+
     }
 
     public String dateConverter(Date dates) {
@@ -337,12 +346,16 @@ public class DatabaseOperations {
                                     //Child Loop for fetching all the des and Amt
                                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                         Object value = dataSnapshot.getValue();
-                                        String[] arr = allDate.split("-");
+                                        /*if(finalKeyword.equals("Expense"))
+                                            s.insertData(allDate, String.valueOf(value), "");
+                                        else if(finalKeyword.equals("Income"))
+                                            s.insertData(allDate, "", String.valueOf(value));*/
+                                        /*String[] arr = allDate.split("-");
                                         String month = arr[1].trim();
                                         String year = arr[2].trim();
-                                        String monthAndYear = month+"-"+year;
+                                        String monthAndYear = month+"-"+year;*/
                                         JSONObject jobj = new JSONObject();
-                                        jobj.put("monthAndYear", monthAndYear);
+                                        jobj.put("monthAndYear", allDate);
                                         jobj.put(finalKeyword+"Amt", value);
                                         jrr.put(jobj);
                                     }
@@ -352,11 +365,10 @@ public class DatabaseOperations {
 
                                 System.out.println("JSON Arrayyy "+jrr);
                                 if(finalKeyword.equals("Income")){
+
                                     System.out.println("JSON Array is "+jrr);
                                     // Extract the JSONObjects
                                     List<JSONObject> list = new ArrayList();
-                                    List<Integer> incomes = new ArrayList<>();
-                                    List<Integer> expenses = new ArrayList<>();
                                     JSONArray sortedJsonArray = new JSONArray();
                                     for(int i = 0; i < jrr.length(); i++) {
                                         try {

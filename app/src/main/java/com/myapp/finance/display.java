@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +32,10 @@ public class display extends AppCompatActivity {
         Intent in = getIntent();
         String data = in.getStringExtra("Jsondata");
         System.out.println("Json Data is"+data);
+        if(data==null){
+            Toast.makeText(this, "No Data..!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         TableLayout t1 = findViewById(R.id.tbl);
         Button close = findViewById(R.id.cl);
@@ -41,7 +47,7 @@ public class display extends AppCompatActivity {
         Params.setMargins(0, 0, 20, 0);
         try {
             JSONArray getResponse = new JSONArray(data);
-            String date = "", Des = "", Keyword = "No";
+            String date = "", Des = "";
             for (int k = 0; k < getResponse.length(); k++) {
                 TableRow row = new TableRow(display.this);
                 JSONObject jobj = getResponse.getJSONObject(k);
@@ -55,7 +61,6 @@ public class display extends AppCompatActivity {
                     Des = jobj.getString("ExpenseDes");
                     Amot = jobj.getInt("ExpenseAmt");
                 }
-                System.out.println("Json String value:" + Keyword);
                 //Counting Total values
                 String col_name[] = {date, Des, Amot + ""};
                 for (String i : col_name) {
@@ -83,78 +88,6 @@ public class display extends AppCompatActivity {
         } catch (Exception e) {
             new sql(this).show("Error", e.toString(), "OK");
         }
-
-
-        /*Volley.newRequestQueue(this).add(new JsonArrayRequest(Request.Method.POST, ip, null, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                try {
-                    for (int k = 0; k < response.length(); k++) {
-                        TableRow row = new TableRow(display.this);
-                        JSONObject jobj = response.getJSONObject(k);
-                        String date = jobj.getString("Date");
-                        String Des = jobj.getString("Description");
-                        Integer Amot = jobj.getInt("Amount");
-                        String col_name[] = {date, Des, Amot + ""};
-                        for (String i : col_name) {
-                            row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
-                                    TableLayout.LayoutParams.WRAP_CONTENT));
-                            TextView tv = new TextView(getApplicationContext());
-                            tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                                    TableRow.LayoutParams.WRAP_CONTENT));
-                            tv.setGravity(Gravity.CENTER);
-                            tv.setText(i);
-                            tv.setTextSize(15);
-                            tv.setPadding(5, 5, 5, 5);
-                            row.addView(tv);
-                        }
-                        t1.addView(row);
-                    }
-                } catch (Exception e) {
-                    new sql(getApplicationContext()).show("Error", e.toString(), "OK");
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                new sql(getApplicationContext()).show("Error", error.toString(), "OK");
-            }
-        })
-        {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                params.put("sdate","01-11-2019");
-                params.put("edate","30-11-2019");
-                return params;
-            }
-
-            @Override
-            protected Response<JSONArray> parseNetworkResponse(
-                    NetworkResponse response) {
-                try {
-                    String jsonString = new String(response.data,
-                            HttpHeaderParser
-                                    .parseCharset(response.headers));
-                    return Response.success(new JSONArray(jsonString),
-                            HttpHeaderParser
-                                    .parseCacheHeaders(response));
-                } catch (UnsupportedEncodingException e) {
-                    return Response.error(new ParseError(e));
-                } catch (JSONException je) {
-                    return Response.error(new ParseError(je));
-                }
-            }
-        });*/
-
-        /*final String ip = "http://192.168.1.8/Display.php";
-        Map<String,String> params = new HashMap<>();
-        params.put("sdate","01-11-2019");
-        params.put("edate","30-11-2019");
-        CustomRequest req = new CustomRequest(Request.Method.GET,ip,params,this.createRequestSuccessListener(),this.createRequestErrorListener());
-        System.out.println("Datas are:"+req);
-        MySingleTon.getInstance(getApplicationContext()).addToRequestQue(req);*/
-
 
         close.setOnClickListener((v) -> {
             if (v.getId() == R.id.cl) {

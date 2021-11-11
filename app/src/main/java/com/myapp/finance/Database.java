@@ -62,7 +62,7 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
     String u_id,option_selected;
     TableRow row;
     TextView loadingImage;
-    DatabaseOperations databaseOperations = new DatabaseOperations(this);
+    DatabaseOperations databaseOperations = new DatabaseOperations(Database.this);
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("ResourceType")
@@ -219,6 +219,11 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                                         layout.removeAllViews();
                                         return;
                                     }
+                                    if(st_date.compareTo(e_date)==0){
+                                        s.show("Date Error","Start Date cannot be Same as End Date", "Ok");
+                                        return;
+                                    }
+
                                     String value = s.onCheckboxClicked(expense,income),url = "";
                                     String Keyword[] = value.split(";;");
                                     //Keyword[0] denotes keyword and Keyword[1] denotes URL

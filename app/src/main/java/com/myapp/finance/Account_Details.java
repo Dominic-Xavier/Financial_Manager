@@ -65,6 +65,7 @@ public class Account_Details extends AppCompatActivity {
 
     Handler handler = new Handler();
     TextView loadingImage;
+    Database database = new Database();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +73,7 @@ public class Account_Details extends AppCompatActivity {
         setContentView(R.layout.account_details);
 
         String u_id="",Name="",mob_num="";
+
 
         Intent in = getIntent();
         String data = in.getStringExtra("Jsondata");
@@ -82,15 +84,12 @@ public class Account_Details extends AppCompatActivity {
         loadingImage = findViewById(R.id.loadingImage);
 
         handler.postAtFrontOfQueue(() -> {
-            String Username = sql.getData("Username", this);
             String imageName = sql.getData("ImageName", this);
-            if(Username!=null && !Username.equals("") && !Username.isEmpty()){
-                if(imageName!=null)
-                    downloadImage(imageName);
-                else
-                    getimageNames();
-                displayData();
-            }
+            if(imageName!=null)
+                downloadImage(imageName);
+            else
+                getimageNames();
+            displayData();
         });
 
         name = findViewById(R.id.Name);
