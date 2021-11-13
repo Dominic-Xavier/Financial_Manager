@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.myapp.finance.Data;
 import com.myapp.finance.Database;
 import com.myapp.finance.FlowTracker;
 import com.myapp.finance.MainFragment;
@@ -46,6 +47,7 @@ public class DatabaseOperations {
     List<Date> col = new ArrayList<>();
     DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
     int exp = 0, exp1 = 0, inc = 0, inc1 = 0;
+    static int count = 0;
 
     JSONArray jrr = new JSONArray();
 
@@ -102,7 +104,7 @@ public class DatabaseOperations {
                             intent_name.setClass(context.getApplicationContext(), login.class);
                             context.startActivity(intent_name);
                             ((Activity)context).finish();
-                            Toast.makeText(context, "Values inserted Successfully...!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "User Created Successfully...!", Toast.LENGTH_SHORT).show();
                         }
                         else
                             Toast.makeText(context, "Error in inserting Values...!", Toast.LENGTH_SHORT).show();
@@ -141,10 +143,12 @@ public class DatabaseOperations {
     }
 
 
-    public void displayData(String option, String startDate, String endDate) {
+    public void displayData(String option, String startDate, String endDate) throws ParseException {
 
         String username = sql.getData("Username", context);
         System.out.println("Username is:"+username);
+        Date stDate = StringToDateConverter(startDate);
+        Date enDate = StringToDateConverter(endDate);
 
         //Code for getting all the dates
         data.child(username).child(option).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -155,7 +159,7 @@ public class DatabaseOperations {
                     String allDate = snapshots.getKey();
                     try {
                         Date date = StringToDateConverter(allDate);
-                        if(date.after(sdf.parse(startDate)) && date.before(sdf.parse(endDate)))
+                        if(date.after(stDate) && date.before(enDate))
                             //Storing all the dates which matches the criteria in a list
                             col.add(sdf.parse(allDate));
                         Log.i("Size of list", String.valueOf(col.size()));
@@ -182,6 +186,7 @@ public class DatabaseOperations {
                                 if(value==null){
                                     intent_name = new Intent();
                                     intent_name.putExtra("Jsondata", String.valueOf(jrr));
+                                    intent_name.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     intent_name.setClass(context.getApplicationContext(), display.class);
                                     context.startActivity(intent_name);
                                     ((Activity)context).finish();
@@ -209,6 +214,7 @@ public class DatabaseOperations {
                                         intent_name = new Intent();
                                         intent_name.putExtra("Jsondata", String.valueOf(jrr));
                                         intent_name.setClass(context.getApplicationContext(), display.class);
+                                        intent_name.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         context.startActivity(intent_name);
                                         ((Activity)context).finish();
                                     }
@@ -228,6 +234,12 @@ public class DatabaseOperations {
                         s.show("Error", el.getMessage(), "ok");
                     }
                 }
+                intent_name = new Intent();
+                intent_name.putExtra("Jsondata", String.valueOf(jrr));
+                intent_name.setClass(context.getApplicationContext(), display.class);
+                intent_name.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                ((Activity)context).finish();
+                context.startActivity(intent_name);
             }
 
             @Override
@@ -240,7 +252,6 @@ public class DatabaseOperations {
     public void displayData(String startDate, String endDate){
         String username = sql.getData("Username", context);
         String Keyword;
-        JSONArray jrr = new JSONArray();
 
         for (int i=0;i<2;i++){
             if(i==0)
@@ -251,6 +262,7 @@ public class DatabaseOperations {
             data.child(username).child(Keyword).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    count++;
                     for (DataSnapshot snapshots : snapshot.getChildren()) {
                         String allDate = snapshots.getKey();
                         try {
@@ -307,7 +319,14 @@ public class DatabaseOperations {
                 }
             });
         }
-
+        /*if(count==0 || count==1) {
+            intent_name = new Intent();
+            intent_name.putExtra("Jsondata", String.valueOf(jrr));
+            intent_name.setClass(context.getApplicationContext(), MainFragment.class);
+            intent_name.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent_name);
+            ((Activity)context).finish();
+        }*/
     }
 
     public String dateConverter(Date dates) {
@@ -325,7 +344,6 @@ public class DatabaseOperations {
     public void displayData() {
         String username = sql.getData("Username", context);
         String Keyword;
-        JSONArray jrr = new JSONArray();
 
         for (int i=0;i<2;i++){
             if(i==0)
@@ -336,6 +354,7 @@ public class DatabaseOperations {
             data.child(username).child(Keyword).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    count++;
                     //Parrent Loop for fetching date
                     for (DataSnapshot snapshots : snapshot.getChildren()) {
                         String allDate = snapshots.getKey();
@@ -446,6 +465,14 @@ public class DatabaseOperations {
                     s.show("Error", "Error is "+error,"Ok");
                 }
             });
+        }
+        if(count==0 || count==1) {
+            intent_name = new Intent();
+            intent_name.putExtra("Jsondata", String.valueOf(jrr));
+            intent_name.setClass(context.getApplicationContext(), FlowTracker.class);
+            intent_name.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent_name);
+            ((Activity)context).finish();
         }
     }
 }

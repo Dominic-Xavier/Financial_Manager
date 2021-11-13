@@ -76,7 +76,9 @@ public class MainFragment extends AppCompatActivity {
         }
 
         close.setOnClickListener((v)-> {
-            startActivity(new Intent(MainFragment.this,Database.class));
+            /*Intent intent = new Intent(MainFragment.this,Database.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);*/
             finish();
         });
 
@@ -105,5 +107,14 @@ public class MainFragment extends AppCompatActivity {
         TableLayout.LayoutParams Params = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
         Params.setMargins(left,top,right,bottom);
         return Params;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(MainFragment.this,Database.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }

@@ -36,4 +36,8 @@
         <item name="android:textColorHint">@color/white</item>
     </style>
 
+    <style name="PinTheme">
+        <item name="pinViewStyle">@style/PinWidget.PinView</item>
+    </style>
+
 </resources>

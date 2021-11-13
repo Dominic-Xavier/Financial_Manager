@@ -4,28 +4,45 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.myapp.finance.FireBase.DatabaseOperations;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 
 public class Register extends AppCompatActivity {
 
-    Button b1, b2;
-    EditText t1, t2, t3,t4;
-    String s1,s2,s3,s4;
-    Map<String, String> map = new HashMap<>();
+    private Button b1, b2;
+    private EditText t1, t2, t3,t4;
+    private String s1,s2,s3,s4;
+    private Map<String, String> map = new HashMap<>();
+    private FirebaseAuth auth;
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBacks;
+    DatabaseOperations operations = new DatabaseOperations(this);
+    Intent intent;
+    private static String systemCode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        DatabaseOperations operations = new DatabaseOperations(this);
-
+        auth = FirebaseAuth.getInstance();
 
         b1 =  findViewById(R.id.create);
         b2 =  findViewById(R.id.cancel);
@@ -53,7 +70,10 @@ public class Register extends AppCompatActivity {
                     map.put("Username", s1);
                     map.put("Password", s2);
                     map.put("MobileNumber", s4);
-                    operations.register(map);
+                    intent = new Intent(Register.this, VerifyPhoneNumber.class);
+                    intent.putExtra("Datas", (Serializable) map);
+                    startActivity(intent);
+                    finish();
                 }
         });
 

@@ -2,6 +2,8 @@ package com.myapp.finance;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +32,8 @@ public class FlowTracker extends AppCompatActivity implements RecyclerBaseAdapte
     List<String> years = new ArrayList<>();
     List<String> months = new ArrayList<>();
     List<Integer> total_values = new ArrayList<>();
-
+    ProgressBar progressBar;
+    TextView loadingData;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +41,8 @@ public class FlowTracker extends AppCompatActivity implements RecyclerBaseAdapte
         setContentView(R.layout.activity_expense);
 
         TextView close = findViewById(R.id.quit_recycler);
+        progressBar = findViewById(R.id.loadingData);
+        loadingData = findViewById(R.id.loadingTextView);
         List<JSONObject> list = new ArrayList<>();
         sql s = new sql(FlowTracker.this);
 
@@ -57,7 +62,7 @@ public class FlowTracker extends AppCompatActivity implements RecyclerBaseAdapte
 
         s.deleteAllDataInTable();
         for (JSONObject jobj:list){
-            String exp = null, date = null;
+            String exp, date = null;
             try {
                 date = jobj.getString("monthAndYear");
                 exp = jobj.getString("ExpenseAmt");
@@ -93,6 +98,8 @@ public class FlowTracker extends AppCompatActivity implements RecyclerBaseAdapte
         RecyclerBaseAdapter adapter = new RecyclerBaseAdapter(this,years,months,totalExp,totalInc,total_values);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        progressBar.setVisibility(View.GONE);
+        loadingData.setVisibility(View.GONE);
 
         close.setOnClickListener((v)-> {
             exitActivity();

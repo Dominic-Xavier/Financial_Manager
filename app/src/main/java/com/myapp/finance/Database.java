@@ -33,7 +33,9 @@ import com.google.android.material.navigation.NavigationView;
 import com.myapp.finance.FireBase.DatabaseOperations;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -87,7 +89,7 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
         mNavigationView.setNavigationItemSelectedListener(this);
 
         Spinner spinner = findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.Select,android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.Select, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
@@ -211,16 +213,24 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                             public void onClick(DialogInterface dialog, int which) {
                                 String st_date = str.getText().toString();
                                 String e_date = etr.getText().toString();
+                                Date stDate = null, endDate = null;
+                                try {
+                                    stDate = databaseOperations.StringToDateConverter(st_date);
+                                    endDate = databaseOperations.StringToDateConverter(e_date);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
                                 if (s.validformat(st_date) && s.validformat(e_date)) {
-                                    if(st_date.compareTo(e_date)>0){
+                                    if(stDate.compareTo(endDate)>0){
                                         s.show("Date Error","Start Date cannot be greater than End Date", "Ok");
                                         str.setText("");
                                         etr.setText("");
                                         layout.removeAllViews();
                                         return;
                                     }
-                                    if(st_date.compareTo(e_date)==0){
+                                    if(stDate.compareTo(endDate)==0){
                                         s.show("Date Error","Start Date cannot be Same as End Date", "Ok");
+                                        layout.removeAllViews();
                                         return;
                                     }
 
@@ -232,13 +242,21 @@ public class Database extends AppCompatActivity implements View.OnClickListener,
                                         str.setText("");
                                         etr.setText("");
                                     }
-                                    else if(Keyword[0].equals("Both"))
+                                    else if(Keyword[0].equals("Both")){
                                         databaseOperations.displayData(st_date, e_date);
-                                        //new Getjsonarray(Database.this).execute(Keyword[1], u_id, st_date, e_date);
+                                        finish();
+                                    }
+                                    //new Getjsonarray(Database.this).execute(Keyword[1], u_id, st_date, e_date);
+                                    else if(Keyword[0].equals("Expense") || Keyword[0].equals("Income")) {
+                                        try {
+                                            databaseOperations.displayData(Keyword[0], st_date, e_date);
+                                            finish();
+                                            //new Getjsonarray(Database.this).execute(Keyword[1],u_id,st_date, e_date,Keyword[0]);
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
 
-                                    else if(Keyword[0].equals("Expense") || Keyword[0].equals("Income"))
-                                        databaseOperations.displayData(Keyword[0], st_date, e_date);
-                                        //new Getjsonarray(Database.this).execute(Keyword[1],u_id,st_date, e_date,Keyword[0]);
 
                                 } else {
                                     s.show("Error", "Invalid format", "Ok");

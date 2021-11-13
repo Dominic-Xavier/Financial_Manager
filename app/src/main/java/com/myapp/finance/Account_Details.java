@@ -65,7 +65,6 @@ public class Account_Details extends AppCompatActivity {
 
     Handler handler = new Handler();
     TextView loadingImage;
-    Database database = new Database();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
