@@ -34,7 +34,7 @@ public class VerifyPhoneNumber extends AppCompatActivity {
     private AppCompatButton button;
     private FirebaseAuth auth;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBacks;
-    private TextView sendOTPAgain;
+    private TextView sendOTPAgain, loadingTextView;
     private Map<String, String> map;
     private DatabaseOperations databaseOperations = new DatabaseOperations(this);
     private static String systemCode;
@@ -55,6 +55,7 @@ public class VerifyPhoneNumber extends AppCompatActivity {
         sendOTPAgain = findViewById(R.id.click_here);
         progressBar = findViewById(R.id.loading);
         auth = FirebaseAuth.getInstance();
+        loadingTextView = findViewById(R.id.loadingTextView);
 
         sendVerificationCode(mobilenumber);
 
@@ -69,10 +70,12 @@ public class VerifyPhoneNumber extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
+                loadingTextView.setVisibility(View.VISIBLE);
                 String text = pinView.getText().toString();
                 System.out.println("Text is "+text);;
                 verifyCode(text);
                 progressBar.setVisibility(View.GONE);
+                loadingTextView.setVisibility(View.GONE);
             }
         });
     }
@@ -98,6 +101,7 @@ public class VerifyPhoneNumber extends AppCompatActivity {
                 //Send OTP Verification Code to another Activity
                 systemCode = s;
                 progressBar.setVisibility(View.GONE);
+                loadingTextView.setVisibility(View.GONE);
             }
         };
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(auth)
