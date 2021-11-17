@@ -76,9 +76,9 @@ public class MainFragment extends AppCompatActivity {
         }
 
         close.setOnClickListener((v)-> {
-            /*Intent intent = new Intent(MainFragment.this,Database.class);
+            Intent intent = new Intent(MainFragment.this,Database.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);*/
+            startActivity(intent);
             finish();
         });
 

@@ -94,6 +94,7 @@ public class DatabaseOperations {
         data.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                System.out.println("Map object is "+map);
                 String user = map.get("Username");
                 if(snapshot.hasChild(user))
                     Toast.makeText(context, "Username Exists already...!", Toast.LENGTH_SHORT).show();
@@ -114,7 +115,7 @@ public class DatabaseOperations {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                s.show("Error Occured", error.toString(), "Ok");
+                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -259,13 +260,13 @@ public class DatabaseOperations {
             else
                 Keyword = "Income";
             String finalKeyword = Keyword;
-            data.child(username).child(Keyword).addListenerForSingleValueEvent(new ValueEventListener() {
+            data.child(username).child(finalKeyword).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    count++;
                     for (DataSnapshot snapshots : snapshot.getChildren()) {
                         String allDate = snapshots.getKey();
                         try {
+                            count++;
                             Date date = StringToDateConverter(allDate);
                             if(date.after(sdf.parse(startDate)) && date.before(sdf.parse(endDate))){
                                 data.child(username).child(finalKeyword).child(allDate).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -319,14 +320,14 @@ public class DatabaseOperations {
                 }
             });
         }
-        /*if(count==0 || count==1) {
+        if(count==0) {
             intent_name = new Intent();
             intent_name.putExtra("Jsondata", String.valueOf(jrr));
             intent_name.setClass(context.getApplicationContext(), MainFragment.class);
             intent_name.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent_name);
             ((Activity)context).finish();
-        }*/
+        }
     }
 
     public String dateConverter(Date dates) {
